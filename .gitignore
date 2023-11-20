@@ -1,5 +1,6 @@
 # Extra
 *.uf2
+build/
 
 # Prerequisites
 *.d
