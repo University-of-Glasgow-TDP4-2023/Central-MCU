@@ -1,7 +1,6 @@
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"
 #include "hardware/pwm.h"
-// #include "build/_deps/pico_sdk-src/src/rp2_common/hardware_pwm/include/hardware/pwm.hmake"
-// #include "build/_deps/pico_sdk-src/src/rp2_common/hardware_pwm/include/hardware/pwm.h"
 
 // Define GPIO pin for PWM
 const uint PWM_PIN = 20;
