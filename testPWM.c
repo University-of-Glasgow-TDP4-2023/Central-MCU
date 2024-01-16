@@ -23,8 +23,7 @@ int main()
     uint slice_num_1 = pwm_gpio_to_slice_num(PWM_PIN_1);
     uint slice_num_2 = pwm_gpio_to_slice_num(PWM_PIN_2);
 
-    // Get some sensible defaults for the slice configuration. By default, the
-    // counter is allowed to wrap over its maximum range (0 to 2**16-1)
+    // Get some sensible defaults for the slice configuration. By default, the counter is allowed to wrap over its maximum range (0 to 2**16-1)
     pwm_config config = pwm_get_default_config();
 
     pwm_init(slice_num_1, &config, true);
@@ -41,7 +40,7 @@ int main()
         printf("x_raw is %d\n", x_raw);
         printf("y_raw is %d\n", y_raw);
 
-        // scale to 0-255 (0-2**8-1)):
+        // scale to 0-2**8-1 (0-255):
         uint8_t x_pos = x_raw >> 4;
         uint8_t y_pos = y_raw >> 4;
 
