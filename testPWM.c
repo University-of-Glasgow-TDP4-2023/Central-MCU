@@ -1,24 +1,10 @@
-/**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
-// Fade an LED between low and high brightness. An interrupt handler updates
-// the PWM slice's output level each time the counter wraps.
-
 #include "pico/stdlib.h"
 #include <stdio.h>
-#include "pico/time.h"
-#include "hardware/irq.h"
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
 
 #define PWM_PIN_1 0
 #define PWM_PIN_2 1
-
-int fade = 0;
-bool going_up = true;
 
 int main()
 {
