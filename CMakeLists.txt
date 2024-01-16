@@ -24,7 +24,7 @@ add_executable(TestPWM
 
 # Pull in our pico_stdlib which pulls in commonly used features
 # and link the hardware_pwm library
-target_link_libraries(TestPWM pico_stdlib hardware_pwm)
+target_link_libraries(TestPWM pico_stdlib hardware_pwm hardware_adc)
 
 # Enable USB output, disable UART output
 pico_enable_stdio_usb(TestPWM 1) # 1 = enable, 0 = disable
