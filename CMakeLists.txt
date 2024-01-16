@@ -28,6 +28,7 @@ target_link_libraries(TestPWM pico_stdlib hardware_pwm)
 
 # Enable USB output, disable UART output
 pico_enable_stdio_usb(TestPWM 1) # 1 = enable, 0 = disable
+pico_enable_stdio_uart(TestPWM 0) # 1 = enable, 0 = disable
 # Uncomment the next line if you want to disable UART output
 # pico_enable_stdio_uart(TestPWM 0)
 
