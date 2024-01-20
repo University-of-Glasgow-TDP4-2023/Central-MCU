@@ -5,14 +5,14 @@
 #include "hardware/gpio.h"
 
 // Define GPIO pin speed control (PWM):
-#define SPEED_PIN 0
+#define SPEED_PIN 0 // pin 1
 
 // Define GPIO pins for direction control (digital) :
-#define FW_PIN 1
-#define BK_PIN 2
+#define FW_PIN 2 // pin 4
+#define BK_PIN 3 // pin 5
 
 // define GPIO pins for controller input (analog):
-#define X_PIN 31
+#define X_PIN 31 // pin 31
 
 // Define joystick thresholds:
 #define STOP_UPPER_THRESHOLD 120
@@ -22,16 +22,17 @@
  * @brief Initialize the motor driver
  *
  */
-void init_motor()
+void init_motor(uint fw_pin, uint bk_pin, uint speed_pin)
 {
     // STDIO initialization:
     stdio_init_all();
 
     // GPIO initialization:
-    gpio_init(FW_PIN);
-    gpio_set_dir(FW_PIN, GPIO_OUT);
-    gpio_init(BK_PIN);
-    gpio_set_dir(BK_PIN, GPIO_OUT);
+    gpio_init(fw_pin);
+    gpio_set_dir(fw_pin, GPIO_OUT);
+
+    gpio_init(bk_pin);
+    gpio_set_dir(bk_pin, GPIO_OUT);
 
     // ADC initialization:
     adc_init();
@@ -40,9 +41,9 @@ void init_motor()
 
     // PWM initialization:
     // Tell the LED pin that the PWM is in charge of its value.
-    gpio_set_function(SPEED_PIN, GPIO_FUNC_PWM);
+    gpio_set_function(speed_pin, GPIO_FUNC_PWM);
     // Figure out which slice we just connected to the LED pin
-    uint speed_pin_slice_num = pwm_gpio_to_slice_num(SPEED_PIN);
+    uint speed_pin_slice_num = pwm_gpio_to_slice_num(speed_pin);
     // Get some sensible defaults for the slice configuration:
     pwm_config config = pwm_get_default_config();
     pwm_init(speed_pin_slice_num, &config, true);
@@ -60,7 +61,7 @@ void motor_forward(uint fw_pin, uint bk_pin, uint speed_pin, uint8_t value)
 {
     gpio_put(fw_pin, true);
     gpio_put(bk_pin, false);
-    // printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
+    printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
     // Square the value to make the transition appear more linear (final value is between 0 and 2**16-1):
     pwm_set_gpio_level(speed_pin, value * value);
 }
@@ -77,7 +78,7 @@ void motor_backward(uint fw_pin, uint bk_pin, uint speed_pin, uint8_t value)
 {
     gpio_put(fw_pin, false);
     gpio_put(bk_pin, true);
-    // printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
+    printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
     // Square the value to make the transition appear more linear (final value is between 0 and 2**16-1):
     pwm_set_gpio_level(speed_pin, value * value);
 }
@@ -93,6 +94,7 @@ void motor_stop(uint fw_pin, uint bk_pin, uint speed_pin)
 {
     gpio_put(fw_pin, false);
     gpio_put(bk_pin, false);
+    printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
     pwm_set_gpio_level(speed_pin, 0);
 }
 
@@ -115,7 +117,7 @@ uint8_t get_adc_value(uint adc_pin)
 
 int main()
 {
-    init_motor();
+    init_motor(FW_PIN, BK_PIN, SPEED_PIN);
 
     while (true)
     {
@@ -129,7 +131,7 @@ int main()
             printf("\n");
             motor_stop(FW_PIN, BK_PIN, SPEED_PIN);
             // wait for more if we aren't moving (save some power):
-            sleep_ms(500);
+            sleep_ms(10);
             continue;
         }
         else if (y_pos > STOP_UPPER_THRESHOLD)
@@ -162,7 +164,7 @@ int main()
         }
 
         printf("\n");
-        sleep_ms(100);
+        sleep_ms(10);
     }
 
     return 0;

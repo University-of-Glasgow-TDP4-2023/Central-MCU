@@ -17,16 +17,23 @@ project(${MOTOR_DRIVER})
 pico_sdk_init()
 
 
-add_executable(TestPWM
-    testPWM.c
-)
-
 add_executable(${MOTOR_DRIVER}
     mortorDriver.c
 )
 
+add_executable(TestPWM
+testPWM.c
+)
+
+add_executable(TestGPIO
+    testGPIO.c
+)
+
 # Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
 target_link_libraries(TestPWM pico_stdlib hardware_pwm hardware_adc)
+
+target_link_libraries(TestGPIO pico_stdlib)
+
 
 target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc)
 
@@ -35,10 +42,14 @@ target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc)
 pico_enable_stdio_usb(TestPWM 1) 
 pico_enable_stdio_uart(TestPWM 0)
 
+pico_enable_stdio_usb(TestGPIO 1)
+pico_enable_stdio_uart(TestGPIO 0)
+
 pico_enable_stdio_usb(${MOTOR_DRIVER} 1)
 pico_enable_stdio_uart(${MOTOR_DRIVER} 0)
 
 # Create map/bin/hex/uf2 file in addition to ELF
 pico_add_extra_outputs(TestPWM)
+pico_add_extra_outputs(TestGPIO)
 
 pico_add_extra_outputs(${MOTOR_DRIVER})
