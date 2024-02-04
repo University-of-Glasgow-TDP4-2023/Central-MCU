@@ -1,6 +1,7 @@
 # Extra
 *.uf2
 build/
+.vscode
 
 # Prerequisites
 *.d
