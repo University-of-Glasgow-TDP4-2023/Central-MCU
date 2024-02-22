@@ -1,7 +1,10 @@
+# use "make MotorDriver" to build this project:
 set(MOTOR_DRIVER MotorDriver)
 
+include_directories(inc)
+
 add_executable(${MOTOR_DRIVER}
-    mortorDriver.c
+    motorDriver.c
 )
 
 # Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
