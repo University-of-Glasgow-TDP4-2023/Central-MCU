@@ -8,48 +8,26 @@ set(PICO_SDK_FETCH_FROM_GIT on)
 # note: this must happen before project()
 include(pico_sdk_import.cmake)
 
-project(TestPWM)
+project(CentralMCU C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
-set(MOTOR_DRIVER MotorDriver)
-project(${MOTOR_DRIVER})
+if (PICO_SDK_VERSION_STRING VERSION_LESS "1.3.0")
+    message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.3.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
+endif()
 
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-
-add_executable(${MOTOR_DRIVER}
-    mortorDriver.c
-)
-
-add_executable(TestPWM
-testPWM.c
-)
-
-add_executable(TestGPIO
-    testGPIO.c
-)
-
-# Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
-target_link_libraries(TestPWM pico_stdlib hardware_pwm hardware_adc)
-
-target_link_libraries(TestGPIO pico_stdlib)
+add_compile_options(-Wall
+        -Wno-format          # int != int32_t as far as the compiler is concerned because gcc has int32_t as long int
+        -Wno-unused-function # we have some for the docs that aren't called
+        )
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wno-maybe-uninitialized)
+endif()
 
 
-target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc)
-
-# Enable USB output, disable UART output:
-# 1 = enable, 0 = disable.
-pico_enable_stdio_usb(TestPWM 1) 
-pico_enable_stdio_uart(TestPWM 0)
-
-pico_enable_stdio_usb(TestGPIO 1)
-pico_enable_stdio_uart(TestGPIO 0)
-
-pico_enable_stdio_usb(${MOTOR_DRIVER} 1)
-pico_enable_stdio_uart(${MOTOR_DRIVER} 0)
-
-# Create map/bin/hex/uf2 file in addition to ELF
-pico_add_extra_outputs(TestPWM)
-pico_add_extra_outputs(TestGPIO)
-
-pico_add_extra_outputs(${MOTOR_DRIVER})
+# Add project subdirectories here:
+add_subdirectory(testFunctions)
+add_subdirectory(motorDriver)
