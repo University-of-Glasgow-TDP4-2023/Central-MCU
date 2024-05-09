@@ -3,12 +3,17 @@ set(MOTOR_DRIVER MotorDriver)
 
 include_directories(inc)
 
+include(./inc/RF24/CMakeLists.txt)
+
 add_executable(${MOTOR_DRIVER}
-    motorDriver.c
+    main.cpp
+    motorDriver.cpp
+    cable_transceiver.cpp
+
 )
 
 # Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
-target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc)
+target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc hardware_spi hardware_i2c RF24)
 
 # Enable USB output, disable UART output:
 # 1 = enable, 0 = disable.
