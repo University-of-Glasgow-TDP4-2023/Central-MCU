@@ -9,7 +9,7 @@
 // for 32kHz PWM clock frequency = 31250ns PWM clock period.
 // WRAP = PWM clock period / system clock period = 31250ns / 8ns = 3906
 #define PWM_WRAP 3906
-#define PWM_CLOCK_FREQ 32000 // 32kHz
+#define PWM_CLOCK_FREQ 4000 // 4KHz
 
 // Define joystick GPIO pin for input (analog):
 #define Y_PIN 31 // Pin 31
