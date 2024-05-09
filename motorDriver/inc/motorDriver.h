@@ -43,4 +43,10 @@ uint16_t get_adc_value(uint8_t adc_pin);
  */
 uint16_t map_range(uint16_t current_value, uint16_t min_value, uint16_t max_value, uint16_t new_min, uint16_t new_max);
 
+void motor_forward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value);
+
+void motor_backward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value);
+
+void motor_stop(uint fw_pin, uint bk_pin, uint pwm_pin);
+
 #endif // MOTOR_CONTROL_H

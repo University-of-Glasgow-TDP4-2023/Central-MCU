@@ -99,34 +99,35 @@ void setSpeed(int data)
   if (speed >= 1022)
   {
     // do not move
-    pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, STOP_PWM_TIME);
+    motor_stop(FW_PIN, BK_PIN, PWM_PIN);
   }
   else if (speed <= 200)
   {
     // maximum speed
+    // map speed to motor speed value:
+    uint16_t speed = PWM_MAX_VALUE;
+
     if (direction == 1)
     {
-      //! change this to actually change direction for the new driver:
-      pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, FW_PWM_TIME);
+      motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
     }
     else
     {
-      pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, BK_PWM_TIME);
+      motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
     }
   }
   else
   {
-    // map controller speed value to motor speed value:
+    // map speed to motor speed value:
+    uint16_t speed = map_range((uint16_t)speed, SPEED_MAX_VALUE, SPEED_MIN_VALUE, PWM_MIN_VALUE, PWM_MAX_VALUE);
+
     if (direction == 1)
     {
-      //! change this to actually change direction for the new driver:
-      uint16_t speed = map_range((uint16_t)speed, 0, 1024, STOP_PWM_TIME, BK_PWM_TIME);
-      pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, speed);
+      motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
     }
     else
     {
-      uint16_t speed = map_range((uint16_t)speed, 0, 1024, FW_PWM_TIME, STOP_PWM_TIME);
-      pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, speed);
+      motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
     }
   }
 }
@@ -178,7 +179,6 @@ void RX_TX()
     //   Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
     // }
 
-#if DEBUG
     if (report)
     {
       DEBUG_PRINT("Transmission successful!\n"); // payload was delivered
@@ -190,7 +190,6 @@ void RX_TX()
     {
       DEBUG_PRINT("Transmission failed or timed out\n"); // payload was not delivered
     }
-#endif
 
     role = false;
     radio.startListening();

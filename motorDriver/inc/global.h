@@ -19,25 +19,34 @@
 
 // Define GPIO pin for PWM (speed and direction control):
 #define PWM_PIN 0 // Pin 1
-#define PWM_DIV_INT_SHIFT 4
+#define PWM_MAX_VALUE 255
+#define PWM_MIN_VALUE 0
+// #define PWM_DIV_INT_SHIFT 4
 // for 32kHz PWM clock frequency = 31250ns PWM clock period.
 // WRAP = PWM clock period / system clock period = 31250ns / 8ns = 3906
-#define PWM_WRAP 3906
-#define PWM_CLOCK_FREQ 4000 // 4KHz
+// #define PWM_WRAP 3906
+// #define PWM_CLOCK_FREQ 4000 // 4KHz
 
 // Define joystick GPIO pin for input (analog):
-#define Y_PIN 31 // Pin 31
+// #define Y_PIN 31 // Pin 31
+
+// GPIO pins for motor direction control:
+#define FW_PIN 31
+#define BK_PIN 32
+
+#define PWM_MAX_VALUE 1024
+#define PWM_MIN_VALUE 0
 
 // Define joystick raw values:
-#define MIN_JOYSTICK_VALUE 20
-#define MAX_JOYSTICK_VALUE 4095
-#define STATIONARY_JOYSTICK_VALUE 1850 // Mid point - actual range fluctuates between 1800 and 1900
+// #define MIN_JOYSTICK_VALUE 20
+// #define MAX_JOYSTICK_VALUE 4095
+// #define STATIONARY_JOYSTICK_VALUE 1850 // Mid point - actual range fluctuates between 1800 and 1900
 
 // Define motor driver constants:
-#define STOP_PWM_TIME 1500 // microseconds for stop
-#define STOP_RANGE 50      // range of values around the stop value
-#define FW_PWM_TIME 1900   // microseconds for forward
-#define BK_PWM_TIME 1100   // microseconds for backward
+// #define STOP_PWM_TIME 1500 // microseconds for stop
+// #define STOP_RANGE 50      // range of values around the stop value
+// #define FW_PWM_TIME 1900   // microseconds for forward
+// #define BK_PWM_TIME 1100   // microseconds for backward
 
 #if DEBUG
 // Define how many bars to use for visualisation:
@@ -47,5 +56,7 @@
 //! Constants for comms:
 #define CE_PIN 22
 #define CSN_PIN 21
+#define SPEED_MAX_VALUE 1024
+#define SPEED_MIN_VALUE 0
 
 #endif // GLOBAL_H
