@@ -14,8 +14,8 @@ volatile int pulse_counter = 0;
 volatile int total_pulses = 0;
 volatile int current_direction = 0;
 
-volatile bool init_button_A_found = false;
-volatile bool init_button_B_found = false;
+volatile int init_button_A_found = 0;
+volatile int init_button_B_found = 0;
 
 double rope_length_m = 0;
 
@@ -50,36 +50,38 @@ void ISR_button_A_init(uint gpio, uint32_t events) {
     printf("First end-point found.\nSearching for second end-point...\n");
 
     pulse_counter = 0;
-    init_button_A_found = true;
+    init_button_A_found = 1;
 
-    gpio_set_irq_enabled(PIN_BUTTON_B, GPIO_IRQ_EDGE_FALL, true);
+    // gpio_set_irq_enabled(PIN_BUTTON_B, GPIO_IRQ_EDGE_FALL, true);
+    gpio_set_irq_enabled_with_callback(PIN_BUTTON_B, GPIO_IRQ_EDGE_FALL, true, ISR_button_B_init);
 }
 
 void ISR_button_B_init(uint gpio, uint32_t events) {
     gpio_set_irq_enabled(PIN_BUTTON_B, GPIO_IRQ_EDGE_FALL, false);
-    init_button_B_found = true;
+    init_button_B_found = 1;
 
     total_pulses = 0;
 
     printf("Second end-point found.\n");
 }
 
-double get_angular_distance(int n_pulses) {
+double get_angular_distance() {
+
     const int pulses_per_round_per_disk = 100;
     const double degrees_per_pulse = 360.0 / (pulses_per_round_per_disk * 2);
 
-    return n_pulses * degrees_per_pulse;
+    return pulse_counter * degrees_per_pulse;
 }
 
-double get_linear_distance(int n_pulses) {
+double get_linear_distance() {
     const double wheel_diameter = 8.0;
     const double wheel_circumference = M_PI * wheel_diameter;
-    return wheel_circumference * (get_angular_distance(n_pulses) / 360.0);
+    return wheel_circumference * (get_angular_distance(pulse_counter) / 360.0);
 }
 
-double get_linear_speed(int n_pulses) {
+double get_linear_speed() {
     const double time_period_s = TIME_PERIOD_MS / 1000.0;
-    double speed_cm_per_s = get_linear_distance(n_pulses) / time_period_s;
+    double speed_cm_per_s = get_linear_distance(pulse_counter) / time_period_s;
     double speed_m_per_s = speed_cm_per_s / 100.0;
     return speed_m_per_s;
 }
@@ -95,14 +97,16 @@ void deactivate_interrupts() {
 }
 
 void activate_interrupts() {
-    gpio_set_irq_enabled(PIN_A, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+    // gpio_set_irq_enabled(PIN_A, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+    gpio_set_irq_enabled_with_callback(PIN_A, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, ISR_A);
+
     timer_id = add_alarm_in_ms(TIME_PERIOD_MS, display_callback, NULL, true);
 }
 
 void start_initialisation() {
     deactivate_interrupts();
 
-    gpio_set_irq_enabled_with_callback(PIN_A, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, ISR_A);
+    // gpio_set_irq_enabled_with_callback(PIN_A, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, ISR_A);
     gpio_set_irq_enabled_with_callback(PIN_BUTTON_A, GPIO_IRQ_EDGE_FALL, true, ISR_button_A_init);
 
     printf("Initialisation running...\nSearching for first end-point...\n");
@@ -121,7 +125,7 @@ void start_initialisation() {
 }
 
 double get_location_m() {
-    return get_linear_distance(total_pulses) / 100.0;
+    return get_linear_distance() / 100.0;
 }
 
 double get_location_perc() {
