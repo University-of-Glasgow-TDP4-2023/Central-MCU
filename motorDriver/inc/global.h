@@ -34,9 +34,6 @@
 #define FW_PIN 31
 #define BK_PIN 32
 
-#define PWM_MAX_VALUE 1024
-#define PWM_MIN_VALUE 0
-
 // Define joystick raw values:
 // #define MIN_JOYSTICK_VALUE 20
 // #define MAX_JOYSTICK_VALUE 4095
@@ -53,10 +50,14 @@
 #define VISUALISATION_WIDTH 20
 #endif
 
-//! Constants for comms:
+//' Constants for comms:
 #define CE_PIN 22
 #define CSN_PIN 21
 #define SPEED_MAX_VALUE 1024
 #define SPEED_MIN_VALUE 0
+
+//' UART:
+#define UART_TX_PIN 4 // pin 6
+#define UART_RX_PIN 5 // pin 7
 
 #endif // GLOBAL_H

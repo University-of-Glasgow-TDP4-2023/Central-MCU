@@ -1,15 +1,28 @@
 #include "./inc/global.h"
 #include "./inc/motorDriver.h"
 #include "./inc/cable_transceiver.h"
+#include "./inc/stabilisation_uart.h"
+
+bool stabilisation_error_flag = false;
+
+void uart_rx_callback()
+{
+    stabilisation_error_flag = process_message();
+}
 
 int main()
 {
-    init_motor(PWM_PIN);
-    setupRadio(); // init transceiver
+    init_motor(PWM_PIN); // init motor driver
+    setupRadio();        // init transceiver
+
+    uart_setup(UART_TX_PIN, UART_RX_PIN, (void *)uart_rx_callback); // init stabilisation uart
 
     // sendMotorPacket(speed, direction, distance); //! ????
 
     RX_TX(); // loop
+
+    // call this to turn stabilisation on or off:
+    set_stabilisation_on(true); //! how to get the value from comms?
 
     // uint16_t y_pos_raw = 0;
 
@@ -54,24 +67,6 @@ int main()
 
     //     sleep_ms(100);
     // }
-
-    //' UART
-    // #define UART_TX_PIN  0
-    // #define UART_RX_PIN  1
-
-    // bool stabilisation_error_flag = false;
-
-    // void uart_rx_callback() {
-    // stabilisation_error_flag = process_message();
-    // }
-
-    // int main() {
-    // uart_setup(UART_TX_PIN, UART_RX_PIN, uart_rx_callback);
-
-    // // call this to turn stabilisation on or off:
-    // set_stabilisation_on(true/false);
-    // }
-    //' END UART
 
     return 0;
 }

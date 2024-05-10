@@ -9,7 +9,7 @@ add_executable(${MOTOR_DRIVER}
     main.cpp
     motorDriver.cpp
     cable_transceiver.cpp
-
+    stabilisation_uart.cpp
 )
 
 # Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
