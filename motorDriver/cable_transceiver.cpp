@@ -62,10 +62,10 @@ void displayMotorData(int data)
   //   Serial.println(distance-100);
   //   Serial.println(cableLength);
   // #if DEBUG
-  //   DEBUG_PRINT(speed);
-  //   DEBUG_PRINT(direction);
-  //   DEBUG_PRINT(distance - 100);
-  //   DEBUG_PRINT(cableLength);
+  // DEBUG_PRINT("%d\n", speed);
+  // DEBUG_PRINT("%d\n", direction);
+  // DEBUG_PRINT("%d\n", distance - 100);
+  // DEBUG_PRINT("%d\n", cableLength);
   // #endif
 }
 
@@ -83,9 +83,9 @@ void sendCableLength(int length)
   createPayload(10, payloadData);
 }
 
-void sendMotorPacket(int speed, int direction, int distance)
+void sendMotorPacket(int speed, int direction, int distance, int error)
 {
-  int payloadData = (speed * 100000 + direction * 10000 + distance * 10);
+  int payloadData = (speed * 100000 + direction * 10000 + distance * 10 + error);
   createPayload(11, payloadData);
 }
 
@@ -155,7 +155,24 @@ void executePayload(int payload)
     setSpeed(data);
     break;
   }
+  case 14:
+  {
+    // Stabilisation off
+    //' switch
+    // set_stabilisation_on(true);
+
+    break;
   }
+  }
+}
+
+void stabilisationError()
+{
+  createPayload(13, 0);
+}
+void stabilisationOff()
+{
+  createPayload(14, 0);
 }
 
 // END OF MOTOR INTEGRATION
@@ -184,7 +201,7 @@ void RX_TX()
       DEBUG_PRINT("Transmission successful!\n"); // payload was delivered
       // DEBUG_PRINT("Time to transmit = ");
       // DEBUG_PRINT(end_timer - start_timer); // print the timer result
-      DEBUG_PRINT("Sent: ");
+      // DEBUG_PRINT("Sent: ");
     }
     else
     {

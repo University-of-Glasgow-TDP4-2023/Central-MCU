@@ -17,12 +17,37 @@ int main()
 
     uart_setup(UART_TX_PIN, UART_RX_PIN, (void *)uart_rx_callback); // init stabilisation uart
 
-    // sendMotorPacket(speed, direction, distance); //! ????
-
-    RX_TX(); // loop
-
     // call this to turn stabilisation on or off:
-    set_stabilisation_on(true); //! how to get the value from comms?
+    // set_stabilisation_on(true); //! how to get the value from comms?
+
+    //! after length is measured:
+    // sendCableLength(int);
+
+    while (true)
+    {
+        RX_TX();
+
+        if (stabilisation_error_flag)
+        {
+            //! sendMotorPacket(speed, direction, distance);
+            // speed = 100 = 1m/s
+            // direction = 1 = forward
+            // distance = 100 = %
+            sendMotorPacket(100, 1, 100 + 10, 1);
+        }
+        else
+        {
+            sendMotorPacket(100, 1, 100, 0);
+        }
+
+        // RX_TX();
+
+        // if (stabilisation_error_flag)
+        // {
+        //     stabilisationError();
+        // }
+        RX_TX();
+    }
 
     // uint16_t y_pos_raw = 0;
 

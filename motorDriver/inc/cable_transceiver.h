@@ -24,9 +24,11 @@ void setupRadio();
 void displayMotorData(int data);
 void createPayload(int command, int data);
 void sendCableLength(int length);
-void sendMotorPacket(int speed, int direction, int distance);
+void sendMotorPacket(int speed, int direction, int distance, int error);
 void setSpeed(int data);
 void executePayload(int payload);
 void RX_TX();
+void stabilisationError();
+void stabilisationOff();
 
 #endif // CABLE_TRANSCEIVER_H
