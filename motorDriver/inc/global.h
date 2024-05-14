@@ -31,8 +31,8 @@
 // #define Y_PIN 31 // Pin 31
 
 // GPIO pins for motor direction control:
-#define FW_PIN 31
-#define BK_PIN 32
+#define FW_PIN 14 // pin 19
+#define BK_PIN 15 // pin 20
 
 // Define joystick raw values:
 // #define MIN_JOYSTICK_VALUE 20
