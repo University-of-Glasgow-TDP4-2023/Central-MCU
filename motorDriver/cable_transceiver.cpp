@@ -91,45 +91,76 @@ void sendMotorPacket(int speed, int direction, int distance, int error)
 
 void setSpeed(int data)
 {
-  int unprocessed_speed = data / 10000;
-  float speed = unprocessed_speed;
-  speed = speed / 100;
+  double unprocessed_speed = data / 10000;
+  DEBUG_PRINT("Unprocessed Speed: %f\n", unprocessed_speed);
+  // double speed = unprocessed_speed;
+  // speed = speed / 100;
+  // map ~130 to 1023 to motor speed 0 to 255:
+  int speed = (int)(-305.83447 * log10(unprocessed_speed / 1023));
   int direction = (data / 1000) % 10;
 
-  if (speed >= 1022)
-  {
-    // do not move
-    motor_stop(FW_PIN, BK_PIN, PWM_PIN);
-  }
-  else if (speed <= 200)
-  {
-    // maximum speed
-    // map speed to motor speed value:
-    uint16_t speed = PWM_MAX_VALUE;
+  DEBUG_PRINT("Speed: %d\n", speed);
+  DEBUG_PRINT("Direction: %d\n", direction);
 
-    if (direction == 1)
-    {
-      motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
-    }
-    else
-    {
-      motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
-    }
+  if (speed < 1)
+  {
+    speed = PWM_MIN_VALUE;
+  }
+  else if (speed > 255)
+  {
+    speed = PWM_MAX_VALUE;
+  }
+
+  if (direction == 1)
+  {
+    DEBUG_PRINT("Forward with speed: %d\n", speed);
+    motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
   }
   else
   {
-    // map speed to motor speed value:
-    uint16_t speed = map_range((uint16_t)speed, SPEED_MAX_VALUE, SPEED_MIN_VALUE, PWM_MIN_VALUE, PWM_MAX_VALUE);
-
-    if (direction == 1)
-    {
-      motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
-    }
-    else
-    {
-      motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
-    }
+    DEBUG_PRINT("Backward with speed: %d\n", speed);
+    motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
   }
+
+  // if (speed >= 1022)
+  // {
+  //   // do not move
+  //   DEBUG_PRINT("Stop\n");
+  //   motor_stop(FW_PIN, BK_PIN, PWM_PIN);
+  // }
+  // else if (speed <= 200)
+  // {
+  //   // maximum speed
+  //   // map speed to motor speed value:
+  //   uint16_t speed = PWM_MAX_VALUE;
+
+  //   if (direction == 1)
+  //   {
+  //     DEBUG_PRINT("Forward with max speed: %d\n", speed);
+  //     motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
+  //   }
+  //   else
+  //   {
+  //     DEBUG_PRINT("Backward with max speed: %d\n", speed);
+  //     motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
+  //   }
+  // }
+  // else
+  // {
+  //   // map speed to motor speed value:
+  //   uint16_t speed = map_range((uint16_t)speed, SPEED_MAX_VALUE, SPEED_MIN_VALUE, PWM_MIN_VALUE, PWM_MAX_VALUE);
+
+  //   if (direction == 1)
+  //   {
+  //     DEBUG_PRINT("Forward with speed: %d\n", speed);
+  //     motor_forward(FW_PIN, BK_PIN, PWM_PIN, speed);
+  //   }
+  //   else
+  //   {
+  //     DEBUG_PRINT("Backward with speed: %d\n", speed);
+  //     motor_backward(FW_PIN, BK_PIN, PWM_PIN, speed);
+  //   }
+  // }
 }
 
 void executePayload(int payload)
