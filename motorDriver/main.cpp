@@ -12,6 +12,17 @@ void uart_rx_callback()
 
 int main()
 {
+    DEBUG_PRINT("Starting motor driver...\n");
+
+    // STDIO initialization:
+    stdio_init_all();
+
+    // GPIO initialization:
+    gpio_init(FW_PIN);
+    gpio_set_dir(FW_PIN, GPIO_OUT);
+    gpio_init(BK_PIN);
+    gpio_set_dir(BK_PIN, GPIO_OUT);
+
     init_motor(PWM_PIN); // init motor driver
     setupRadio();        // init transceiver
 
@@ -23,6 +34,8 @@ int main()
     //! after length is measured:
     // sendCableLength(int);
 
+    DEBUG_PRINT("Motor driver started.\n");
+
     while (true)
     {
         RX_TX();
@@ -33,10 +46,12 @@ int main()
             // speed = 100 = 1m/s
             // direction = 1 = forward
             // distance = 100 = %
+            DEBUG_PRINT("Stabilisation error detected.\n");
             sendMotorPacket(100, 1, 100 + 10, 1);
         }
         else
         {
+            DEBUG_PRINT("No stabilisation error detected.\n");
             sendMotorPacket(100, 1, 100, 0);
         }
 
@@ -47,6 +62,7 @@ int main()
         //     stabilisationError();
         // }
         RX_TX();
+        DEBUG_PRINT("\n");
     }
 
     // uint16_t y_pos_raw = 0;

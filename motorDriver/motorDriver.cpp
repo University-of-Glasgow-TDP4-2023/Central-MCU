@@ -6,14 +6,6 @@
  */
 void init_motor(uint8_t pwm_pin)
 {
-    // STDIO initialization:
-    stdio_init_all();
-
-    // GPIO initialization:
-    gpio_init(FW_PIN);
-    gpio_set_dir(FW_PIN, GPIO_OUT);
-    gpio_init(BK_PIN);
-    gpio_set_dir(BK_PIN, GPIO_OUT);
 
     // ADC initialization:
     // adc_init();
