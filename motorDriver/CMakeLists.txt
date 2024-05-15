@@ -10,10 +10,11 @@ add_executable(${MOTOR_DRIVER}
     motorDriver.cpp
     cable_transceiver.cpp
     stabilisation_uart.cpp
+    encoder.cpp
 )
 
 # Pull in our pico_stdlib which pulls in commonly used features and link the hardware_pwm library
-target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc hardware_spi hardware_i2c RF24)
+target_link_libraries(${MOTOR_DRIVER} pico_stdlib hardware_pwm hardware_adc hardware_spi hardware_i2c RF24 hardware_timer)
 
 # Enable USB output, disable UART output:
 # 1 = enable, 0 = disable.

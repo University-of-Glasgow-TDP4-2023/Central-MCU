@@ -2,6 +2,7 @@
 #include "./inc/motorDriver.h"
 #include "./inc/cable_transceiver.h"
 #include "./inc/stabilisation_uart.h"
+#include "./inc/encoder.h"
 
 bool stabilisation_error_flag = false;
 
@@ -24,15 +25,14 @@ int main()
     gpio_set_dir(BK_PIN, GPIO_OUT);
 
     init_motor(PWM_PIN); // init motor driver
+    encoder_init();      // init encoder
     setupRadio();        // init transceiver
 
+    float rope_length = measure_length(); // measure length of rope
+
+    sendCableLength(rope_length);
+
     uart_setup(UART_TX_PIN, UART_RX_PIN, (void *)uart_rx_callback); // init stabilisation uart
-
-    // call this to turn stabilisation on or off:
-    // set_stabilisation_on(true); //! how to get the value from comms?
-
-    //! after length is measured:
-    // sendCableLength(int);
 
     DEBUG_PRINT("Motor driver started.\n");
 
@@ -40,19 +40,28 @@ int main()
     {
         RX_TX();
 
+        //! sendMotorPacket(speed, direction, distance);
+        // speed = 100 = 1m/s
+        // direction = 1 = forward
+        // distance = 100 = %
+        int actual_speed = abs((int) get_current_speed_ms()*100);
+        int actual_direction = get_current_speed_ms() >= 0 ? 1 : 0;
+        int actual_distance = (int) get_location_percent()+10;
+
+        DEBUG_PRINT("Speed: %d\n", actual_speed);
+        DEBUG_PRINT("Direction: %d\n", actual_direction);
+        DEBUG_PRINT("Distance: %d\n", actual_distance-10);
+
+
         if (stabilisation_error_flag)
         {
-            //! sendMotorPacket(speed, direction, distance);
-            // speed = 100 = 1m/s
-            // direction = 1 = forward
-            // distance = 100 = %
             DEBUG_PRINT("Stabilisation error detected.\n");
-            sendMotorPacket(100, 1, 100 + 10, 1);
+            sendMotorPacket(actual_speed, actual_direction, actual_distance, 1);
         }
         else
         {
             DEBUG_PRINT("No stabilisation error detected.\n");
-            sendMotorPacket(100, 1, 100, 0);
+            sendMotorPacket(actual_speed, actual_direction, actual_distance, 0);
         }
 
         // RX_TX();

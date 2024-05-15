@@ -2,14 +2,15 @@
 #ifndef CABLE_TRANSCEIVER_H
 #define CABLE_TRANSCEIVER_H
 
+#include <math.h>
 #include "./global.h"
 // #include <SPI.h>
 // #include "printf.h"
-#include <math.h>
 #include "hardware/spi.h"
 #include "hardware/pwm.h"
 #include "./RF24/RF24.h"
 #include "./motorDriver.h"
+#include "./encoder.h"
 
 // RF24 radio object
 extern RF24 radio;
@@ -21,7 +22,7 @@ extern int cableLength;
 
 // Function declarations
 void setupRadio();
-void displayMotorData(int data);
+// void displayMotorData(int data);
 void createPayload(int command, int data);
 void sendCableLength(int length);
 void sendMotorPacket(int speed, int direction, int distance, int error);

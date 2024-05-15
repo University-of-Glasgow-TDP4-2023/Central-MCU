@@ -20,6 +20,7 @@
 // Define GPIO pin for PWM (speed and direction control):
 #define PWM_PIN 0 // Pin 1
 #define PWM_MAX_VALUE 255
+#define MID_SPEED 100
 #define PWM_MIN_VALUE 0
 // #define PWM_DIV_INT_SHIFT 4
 // for 32kHz PWM clock frequency = 31250ns PWM clock period.
@@ -59,5 +60,17 @@
 //' UART:
 #define UART_TX_PIN 4 // pin 6
 #define UART_RX_PIN 5 // pin 7
+
+//' Encoder:
+// definitions, constants & variables for encoder
+#define ENCODER_A_PIN 10 // pin to which encoder A disk pin is connected to
+#define ENCODER_B_PIN 11 // pin to which encoder B disk pin is connected to
+// definitions, constants & variables for end_switches
+#define END_SWITCH_A_PIN 12      // pin to which end switch A is connected to
+#define END_SWITCH_B_PIN 13      // pin to which end switch B is connected to
+#define DEBOUNCE_DELAY_US 200000 // TODO: FIND BETTER SYSTEM debounce time for switches in ms
+#define LED_PIN 25
+
+extern int encoder_init_mode_active;
 
 #endif // GLOBAL_H
