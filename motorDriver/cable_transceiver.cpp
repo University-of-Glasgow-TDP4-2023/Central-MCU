@@ -16,6 +16,7 @@ bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to tra
 bool role = false;    // true = TX role, false = RX role
 int payload = 0;
 int cableLength = 0;
+int time_out = 0;
 
 void setupRadio()
 {
@@ -226,6 +227,7 @@ void RX_TX()
     // } else {
     //   Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
     // }
+    
 
     if (report)
     {
@@ -233,10 +235,15 @@ void RX_TX()
       // DEBUG_PRINT("Time to transmit = ");
       // DEBUG_PRINT(end_timer - start_timer); // print the timer result
       // DEBUG_PRINT("Sent: ");
+      time_out = 0;
     }
     else
     {
       DEBUG_PRINT("Transmission failed or timed out\n"); // payload was not delivered
+      time_out += 1;
+      if (time_out >= 3){
+        motor_stop(FW_PIN, BK_PIN, PWM_PIN);
+      }
     }
 
     role = false;
