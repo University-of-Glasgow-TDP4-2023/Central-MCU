@@ -17,6 +17,7 @@ bool role = false;    // true = TX role, false = RX role
 int payload = 0;
 int cableLength = 0;
 int time_out = 0;
+uint8_t is_length_measured = 0; // 0 for not measured, 1 for measured
 
 void setupRadio()
 {
@@ -107,6 +108,13 @@ void setSpeed(int data)
   DEBUG_PRINT("Stabilisation: %d\n", stabilisation);
 
   set_stabilisation_on(stabilisation);
+
+  if (is_length_measured == 0 && direction == 0)
+  {
+    DEBUG_PRINT("Length to be measured now..\n");
+    sendCableLength((int)measure_length());
+    is_length_measured = 1;
+  }
 
   if (speed < 1)
   {
@@ -232,7 +240,6 @@ void RX_TX()
     // } else {
     //   Serial.println(F("Transmission failed or timed out"));  // payload was not delivered
     // }
-    
 
     if (report)
     {
@@ -246,7 +253,8 @@ void RX_TX()
     {
       DEBUG_PRINT("Transmission failed or timed out\n"); // payload was not delivered
       time_out += 1;
-      if (time_out >= 3){
+      if (time_out >= 3)
+      {
         motor_stop(FW_PIN, BK_PIN, PWM_PIN);
       }
     }

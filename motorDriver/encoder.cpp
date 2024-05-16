@@ -1,8 +1,8 @@
 #include "./inc/encoder.h"
 
-const float MM_PER_REV = 6.467389517;       // how much movement happening linearly in cm per 1 full revolution of the encoder
-const int TIME_PERIOD_MS = 50; // time over which speed is calculated in ms
-const int PULSES_PER_REV = 200; // how many pulses the encoder triggers for a whole revolution
+const float MM_PER_REV = 6.467389517; // how much movement happening linearly in cm per 1 full revolution of the encoder
+const int TIME_PERIOD_MS = 50;        // time over which speed is calculated in ms
+const int PULSES_PER_REV = 200;       // how many pulses the encoder triggers for a whole revolution
 const float TIMER_PERIOD_S = TIME_PERIOD_MS / 1000.0f;
 const float DEGREES_PER_PULSE = 360.0f / (PULSES_PER_REV * 2);
 
@@ -26,7 +26,7 @@ bool emergency_stop_B_flag = false;
 bool slower_speed_clockwise_flag = false;
 bool slower_speed_counterclockwise_flag = false;
 
-struct repeating_timer display_timer;   
+struct repeating_timer display_timer;
 
 int encoder_init_mode_active = 0;
 
@@ -118,12 +118,11 @@ bool display_timer_isr(struct repeating_timer *t)
     float speed_mph = get_linear_speed_mph(n_pulses);
     float location_m = get_location_m();
     float location_percent = get_location_percent();
-    
 
     if (emergency_stop_A_flag || emergency_stop_B_flag || slower_speed_clockwise_flag || slower_speed_counterclockwise_flag)
     {
         DEBUG_PRINT("\nACTIVE FLAGS:\n");
-    } 
+    }
 
     if (emergency_stop_A_flag)
     {
@@ -140,10 +139,11 @@ bool display_timer_isr(struct repeating_timer *t)
     if (slower_speed_counterclockwise_flag)
     {
         DEBUG_PRINT("    SS CCW\n");
-    // }
-    n_pulses = 0; // reset n_pulses
+        // }
+        n_pulses = 0; // reset n_pulses
 
-    return true;
+        return true;
+    }
 }
 
 // called if in initialization phase and one of the end buttons was pressed
@@ -301,7 +301,7 @@ float measure_length()
 
         // sleep_ms(500);
     }
-    
+
     add_repeating_timer_ms(TIME_PERIOD_MS, display_timer_isr, NULL, &display_timer);
 
     return get_rope_length_m();

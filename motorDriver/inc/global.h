@@ -82,5 +82,6 @@ extern int encoder_init_mode_active;
 
 extern uint8_t current_pwm_value;
 extern uint8_t current_direction; // 0 for forward, 1 for backward
+extern uint8_t is_length_measured; // 0 for not measured, 1 for measured
 
 #endif // GLOBAL_H

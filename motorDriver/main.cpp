@@ -36,10 +36,11 @@ int main()
     encoder_init();      // init encoder
     setupRadio();        // init transceiver
 
-    float rope_length = measure_length(); // measure length of rope
 
-    // sendCableLength(10);
-    sendCableLength(rope_length);
+    // float rope_length = measure_length(); // measure length of rope
+
+    // // sendCableLength(10);
+    // sendCableLength(rope_length);
 
     uart_setup(UART_TX_PIN, UART_RX_PIN, (void *)uart_rx_callback); // init stabilisation uart
 
@@ -73,8 +74,11 @@ int main()
         DEBUG_PRINT("Actual Distance: %d\n", actual_distance - 10);
         battery_error = gpio_get(BATTERY_ERROR_PIN);
         // DEBUG_PRINT("Battery error: %d\n", battery_error);
-
-        if (stabilisation_error_flag && battery_error)
+        if (is_length_measured == 0){
+            DEBUG_PRINT("Length not measured yet.\n");
+            sendMotorPacket(actual_speed, actual_direction, actual_distance, 9);
+        }
+        else if (stabilisation_error_flag && battery_error)
         {
             DEBUG_PRINT("Stabilisation error and battery error detected.\n");
             sendMotorPacket(actual_speed, actual_direction, actual_distance, 3);
