@@ -5,6 +5,10 @@
 #include "./inc/encoder.h"
 
 bool stabilisation_error_flag = false;
+int actual_speed;
+int actual_direction;
+int actual_distance;
+int battery_error = 0;
 
 void uart_rx_callback()
 {
@@ -23,6 +27,10 @@ int main()
     gpio_set_dir(FW_PIN, GPIO_OUT);
     gpio_init(BK_PIN);
     gpio_set_dir(BK_PIN, GPIO_OUT);
+    // GPIO for battery error:
+    gpio_init(BATTERY_ERROR_PIN);
+    gpio_set_dir(BATTERY_ERROR_PIN, GPIO_IN);
+
 
     init_motor(PWM_PIN); // init motor driver
     encoder_init();      // init encoder
@@ -36,6 +44,8 @@ int main()
 
     DEBUG_PRINT("Motor driver started.\n");
 
+
+
     while (true)
     {
         RX_TX();
@@ -44,16 +54,28 @@ int main()
         // speed = 100 = 1m/s
         // direction = 1 = forward
         // distance = 100 = %
-        int actual_speed = abs((int) get_current_speed_ms()*100);
-        int actual_direction = get_current_speed_ms() >= 0 ? 1 : 0;
-        int actual_distance = (int) get_location_percent()+10;
+        actual_speed = abs((int) get_current_speed_ms()*100);
+        actual_direction = get_current_speed_ms() >= 0 ? 1 : 0;
+        actual_distance = (int) get_location_percent()+10;
+        battery_error = gpio_get(BATTERY_ERROR_PIN);
 
         DEBUG_PRINT("Speed: %d\n", actual_speed);
         DEBUG_PRINT("Direction: %d\n", actual_direction);
         DEBUG_PRINT("Distance: %d\n", actual_distance-10);
+        DEBUG_PRINT("Battery error: %d\n", battery_error);
 
+        if (stabilisation_error_flag && battery_error)
+        {
+            DEBUG_PRINT("Stabilisation error and battery error detected.\n");
+            sendMotorPacket(actual_speed, actual_direction, actual_distance, 3);
+        }
+        else if (battery_error)
+        {
+            DEBUG_PRINT("Battery error detected.\n");
+            sendMotorPacket(actual_speed, actual_direction, actual_distance, 2);
+        }
 
-        if (stabilisation_error_flag)
+        else if (stabilisation_error_flag)
         {
             DEBUG_PRINT("Stabilisation error detected.\n");
             sendMotorPacket(actual_speed, actual_direction, actual_distance, 1);

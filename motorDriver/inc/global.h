@@ -71,6 +71,9 @@
 #define DEBOUNCE_DELAY_US 200000 // TODO: FIND BETTER SYSTEM debounce time for switches in ms
 #define LED_PIN 25
 
+//' Battery error pin:
+#define BATTERY_ERROR_PIN 6 // pin 9
+
 extern int encoder_init_mode_active;
 
 #endif // GLOBAL_H
