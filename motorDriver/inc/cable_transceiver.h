@@ -11,6 +11,7 @@
 #include "./RF24/RF24.h"
 #include "./motorDriver.h"
 #include "./encoder.h"
+#include "./stabilisation_uart.h"
 
 // RF24 radio object
 extern RF24 radio;

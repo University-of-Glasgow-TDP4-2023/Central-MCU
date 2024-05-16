@@ -13,6 +13,7 @@ int battery_error = 0;
 void uart_rx_callback()
 {
     stabilisation_error_flag = process_message();
+    // DEBUG_PRINT("\n\n STABILISATION ERROR FLAG: %d\n\n", stabilisation_error_flag);
 }
 
 int main()
@@ -31,20 +32,28 @@ int main()
     gpio_init(BATTERY_ERROR_PIN);
     gpio_set_dir(BATTERY_ERROR_PIN, GPIO_IN);
 
-
     init_motor(PWM_PIN); // init motor driver
     encoder_init();      // init encoder
     setupRadio();        // init transceiver
 
     float rope_length = measure_length(); // measure length of rope
 
+    // sendCableLength(10);
     sendCableLength(rope_length);
 
     uart_setup(UART_TX_PIN, UART_RX_PIN, (void *)uart_rx_callback); // init stabilisation uart
 
     DEBUG_PRINT("Motor driver started.\n");
 
-
+    // bool temp = true;
+    // while (true){
+    //     set_stabilisation_on(temp);
+    //     DEBUG_PRINT(" ####### temp value %d ### \n", temp);
+    //     sleep_ms(1000);
+    //     set_stabilisation_on(!temp);
+    //     DEBUG_PRINT(" ####### temp value %d ### \n", !temp);
+    //     sleep_ms(1000);
+    // }
 
     while (true)
     {
@@ -54,15 +63,16 @@ int main()
         // speed = 100 = 1m/s
         // direction = 1 = forward
         // distance = 100 = %
-        actual_speed = abs((int) get_current_speed_ms()*100);
-        actual_direction = get_current_speed_ms() >= 0 ? 1 : 0;
-        actual_distance = (int) get_location_percent()+10;
-        battery_error = gpio_get(BATTERY_ERROR_PIN);
+        DEBUG_PRINT("current speed %f\n", get_current_speed_ms());
+        actual_speed = abs((int)(get_current_speed_ms() * 100));
+        DEBUG_PRINT("Actual Speed: %d\n", actual_speed);
 
-        DEBUG_PRINT("Speed: %d\n", actual_speed);
-        DEBUG_PRINT("Direction: %d\n", actual_direction);
-        DEBUG_PRINT("Distance: %d\n", actual_distance-10);
-        DEBUG_PRINT("Battery error: %d\n", battery_error);
+        actual_direction = get_current_speed_ms() >= 0 ? 1 : 0;
+        DEBUG_PRINT("Actual Direction: %d\n", actual_direction);
+        actual_distance = (int)get_location_percent() + 10 <= 999 ? (int)get_location_percent() + 10 : 999; // cap at 999
+        DEBUG_PRINT("Actual Distance: %d\n", actual_distance - 10);
+        battery_error = gpio_get(BATTERY_ERROR_PIN);
+        // DEBUG_PRINT("Battery error: %d\n", battery_error);
 
         if (stabilisation_error_flag && battery_error)
         {
@@ -82,63 +92,13 @@ int main()
         }
         else
         {
-            DEBUG_PRINT("No stabilisation error detected.\n");
+            DEBUG_PRINT("No errors detected.\n");
             sendMotorPacket(actual_speed, actual_direction, actual_distance, 0);
         }
 
-        // RX_TX();
-
-        // if (stabilisation_error_flag)
-        // {
-        //     stabilisationError();
-        // }
         RX_TX();
         DEBUG_PRINT("\n");
     }
-
-    // uint16_t y_pos_raw = 0;
-
-    // pwm high time in microseconds:
-    // uint32_t high_time = 0;
-
-    // uint32_t system_clock_hz = clock_get_hz(clk_sys);
-    // uint32_t system_clock_period_ns = 1000000000 / system_clock_hz;
-
-    // uint32_t pwm_counter = 0;
-
-    //     while (true)
-    //     {
-
-    // #if DEBUG
-    //         DEBUG_PRINT("system clock: %d Hz\n", system_clock_hz);
-    //         DEBUG_PRINT("system clock period: %d ns\n", system_clock_period_ns);
-    // #endif
-
-    // raw adc value between 0 and 2**12-1 (0-4095):
-    // y_pos_raw = get_adc_value(0);
-
-    // DEBUG_PRINT("Raw joystick value: %d\n", y_pos_raw);
-
-    // high_time = map_range(y_pos_raw, MIN_JOYSTICK_VALUE, MAX_JOYSTICK_VALUE, FW_PWM_TIME, BK_PWM_TIME);
-    // if (high_time > STOP_PWM_TIME - STOP_RANGE && high_time < STOP_PWM_TIME + STOP_RANGE)
-    //     high_time = STOP_PWM_TIME;
-
-    // #if DEBUG
-    //         printf("PWM high time %d ms: ", high_time);
-    //         for (uint8_t i = 0; i < map_range(high_time, BK_PWM_TIME, FW_PWM_TIME, 0, VISUALISATION_WIDTH); i++)
-    //             printf("#");
-    //         printf("\n");
-    // #endif
-
-    // pwm_set_chan_level(pwm_gpio_to_slice_num(PWM_PIN), PWM_CHAN_A, high_time);
-
-    // pwm_counter = pwm_get_counter(pwm_gpio_to_slice_num(PWM_PIN));
-    // DEBUG_PRINT("PWM counter: %d\n", pwm_counter);
-
-    // DEBUG_PRINT("\n");
-
-    //     sleep_ms(100);
-    // }
 
     return 0;
 }

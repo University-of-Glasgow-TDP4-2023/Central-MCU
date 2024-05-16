@@ -87,6 +87,7 @@ void sendCableLength(int length)
 void sendMotorPacket(int speed, int direction, int distance, int error)
 {
   int payloadData = (speed * 100000 + direction * 10000 + distance * 10 + error);
+  DEBUG_PRINT("Payload Data: %d\n", payloadData);
   createPayload(11, payloadData);
 }
 
@@ -99,9 +100,13 @@ void setSpeed(int data)
   // map ~130 to 1023 to motor speed 0 to 255:
   int speed = (int)(-305.83447 * log10(unprocessed_speed / 1023));
   int direction = (data / 1000) % 10;
+  int stabilisation = (data / 100) % 10; // 0 = off, 1 = on
 
   DEBUG_PRINT("Speed: %d\n", speed);
   DEBUG_PRINT("Direction: %d\n", direction);
+  DEBUG_PRINT("Stabilisation: %d\n", stabilisation);
+
+  set_stabilisation_on(stabilisation);
 
   if (speed < 1)
   {
@@ -248,7 +253,7 @@ void RX_TX()
 
     role = false;
     radio.startListening();
-    delay(1000); // slow transmissions down by 1 second
+    delay(500); // slow transmissions down by 1 second
   }
   else
   {

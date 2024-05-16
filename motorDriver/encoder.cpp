@@ -30,7 +30,7 @@ struct repeating_timer display_timer;
 
 int encoder_init_mode_active = 0;
 
-int current_speed_ms = 0;
+float current_speed_ms = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////// SIMPLE CALC FUNCTIONS
 
@@ -79,7 +79,7 @@ float get_rope_length_m()
     return get_linear_distance_mm(rope_length_pulses) / 1000.0f;
 }
 
-int get_current_speed_ms()
+float get_current_speed_ms()
 {
     return current_speed_ms;
 }
@@ -114,22 +114,11 @@ bool display_timer_isr(struct repeating_timer *t)
     float angular_distance_deg = get_angular_distance_deg(n_pulses);
     float linear_distance_mm = get_linear_distance_mm(n_pulses);
     current_speed_ms = get_linear_speed_m_per_s(n_pulses);
-    DEBUG_PRINT("###### new speed %d\n", current_speed_ms);
+    // DEBUG_PRINT("###### new speed %d\n", current_speed_ms);
     float speed_mph = get_linear_speed_mph(n_pulses);
     float location_m = get_location_m();
     float location_percent = get_location_percent();
     
-
-    // DEBUG_PRINT("\nn_pulses %d \n", n_pulses);
-    // DEBUG_PRINT("° distance %.2f\n", angular_distance_deg);
-    // DEBUG_PRINT("Distance %.2f \n", linear_distance_cm);
-    // DEBUG_PRINT("Speed m/s: %.2f\n", speed_m_s);
-    // DEBUG_PRINT("Speed mph: %.2f\n", speed_mph);
-    // DEBUG_PRINT("Location pulses: %d\n", location_pulses);
-    // DEBUG_PRINT("Location m: %.2f\n", location_m);
-    // DEBUG_PRINT("Location %%: %.2f\n", location_percent);
-    // DEBUG_PRINT("Rope l pulses: %d\n", rope_length_pulses);
-    // DEBUG_PRINT("Rope l m: %.2f\n", get_rope_length_m());
 
     if (emergency_stop_A_flag || emergency_stop_B_flag || slower_speed_clockwise_flag || slower_speed_counterclockwise_flag)
     {
@@ -151,7 +140,7 @@ bool display_timer_isr(struct repeating_timer *t)
     if (slower_speed_counterclockwise_flag)
     {
         DEBUG_PRINT("    SS CCW\n");
-    }
+    // }
     n_pulses = 0; // reset n_pulses
 
     return true;

@@ -8,6 +8,15 @@
 #include "hardware/gpio.h"
 #include "hardware/clocks.h"
 
+#define PWM_FORWARD_DIRECTION 0
+#define PWM_BACKWARD_DIRECTION 1
+
+// Number of increments (0 to 255 inclusive)
+#define NUMBER_OF_INCREMENTS 256
+
+// Calculate delay per increment
+const uint pwm_delay_ms = (uint)(PWM_DELAY / NUMBER_OF_INCREMENTS);
+
 /**
  * @brief Initialize the motor driver.
  *
@@ -48,5 +57,8 @@ void motor_forward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value);
 void motor_backward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value);
 
 void motor_stop(uint fw_pin, uint bk_pin, uint pwm_pin);
+
+void slow_down(uint target_value, uint pwm_pin);
+void speed_up(uint target_value, uint pwm_pin);
 
 #endif // MOTOR_CONTROL_H

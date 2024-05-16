@@ -1,5 +1,10 @@
 #include "./inc/motorDriver.h"
 
+uint8_t current_pwm_value;
+uint8_t current_direction; // 0 for forward, 1 for backward
+
+uint8_t temp_pwm_value;
+
 /**
  * @brief Initialize the motor driver
  *
@@ -21,6 +26,8 @@ void init_motor(uint8_t pwm_pin)
     // pwm_config_set_wrap(&config, PWM_WRAP);
 
     pwm_init(pwm_pin_slice_num, &config, true);
+
+    DEBUG_PRINT("PWM delay used is %d ms\n", pwm_delay_ms);
 
     DEBUG_PRINT("Motor driver initialized\n");
 }
@@ -101,6 +108,32 @@ uint16_t map_range(uint16_t current_value, uint16_t min_value, uint16_t max_valu
     return (uint16_t)(((current_value - min_value) * (new_max - new_min)) / (max_value - min_value) + new_min);
 }
 
+void speed_up(uint target_value, uint pwm_pin)
+{
+    while (temp_pwm_value < target_value)
+    {
+        temp_pwm_value++;
+        // DEBUG_PRINT(" ### Speeding up to %d\n", temp_pwm_value);
+        pwm_set_gpio_level(pwm_pin, temp_pwm_value * temp_pwm_value);
+        // 12ms delay to have 3 seconds for the motor to go from 0 to 255 speed:
+        sleep_ms(pwm_delay_ms);
+    }
+    // DEBUG_PRINT(" ### Speeded up to %d\n", temp_pwm_value);
+}
+
+void slow_down(uint target_value, uint pwm_pin)
+{
+    while (temp_pwm_value > target_value)
+    {
+        temp_pwm_value--;
+        // DEBUG_PRINT(" ### Slowing down to %d\n", temp_pwm_value);
+        pwm_set_gpio_level(pwm_pin, temp_pwm_value * temp_pwm_value);
+        // 12ms delay to have 3 seconds for the motor to go from 0 to 255 speed:
+        sleep_ms(pwm_delay_ms);
+    }
+    // DEBUG_PRINT(" ### Slowed down to %d\n", temp_pwm_value);
+}
+
 /**
  * @brief Control the motor to move forward
  *
@@ -113,9 +146,31 @@ void motor_forward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value)
 {
     gpio_put(fw_pin, true);
     gpio_put(bk_pin, false);
-    // printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
-    // Square the value to make the transition appear more linear (final value is between 0 and 2**16-1):
-    pwm_set_gpio_level(pwm_pin, value * value);
+
+    temp_pwm_value = current_pwm_value;
+
+    // Check if the motor needs to speed up, slow down, or change direction
+    if (current_pwm_value == 0)
+    {
+        speed_up(value, pwm_pin);
+    }
+    else if (current_direction == PWM_FORWARD_DIRECTION && value < current_pwm_value)
+    {
+        slow_down(value, pwm_pin);
+    }
+    else if (current_direction == PWM_FORWARD_DIRECTION && value > current_pwm_value)
+    {
+        speed_up(value, pwm_pin);
+    }
+    else if (current_direction == PWM_BACKWARD_DIRECTION)
+    {
+        slow_down(0, pwm_pin);    // to stop the motor
+        speed_up(value, pwm_pin); // to start the motor in the opposite direction
+    }
+
+    // store current PWM value and direction:
+    current_pwm_value = value;
+    current_direction = PWM_FORWARD_DIRECTION;
 }
 
 /**
@@ -130,9 +185,33 @@ void motor_backward(uint fw_pin, uint bk_pin, uint pwm_pin, uint8_t value)
 {
     gpio_put(fw_pin, false);
     gpio_put(bk_pin, true);
+
+    temp_pwm_value = current_pwm_value;
+
     // printf("GPIOs are %d, %d\n", gpio_get(fw_pin), gpio_get(bk_pin));
     // Square the value to make the transition appear more linear (final value is between 0 and 2**16-1):
-    pwm_set_gpio_level(pwm_pin, value * value);
+    if (current_pwm_value == 0)
+    {
+        speed_up(value, pwm_pin);
+    }
+    else if (current_direction == PWM_BACKWARD_DIRECTION && value < current_pwm_value)
+    {
+        slow_down(value, pwm_pin);
+    }
+    else if (current_direction == PWM_BACKWARD_DIRECTION && value > current_pwm_value)
+    {
+        speed_up(value, pwm_pin);
+    }
+    else if (current_direction == PWM_FORWARD_DIRECTION)
+    {
+        slow_down(0, pwm_pin);    // to stop the motor
+        speed_up(value, pwm_pin); // to start the motor in the opposite direction
+    }
+    // pwm_set_gpio_level(pwm_pin, value * value);
+
+    // store current PWM value and direction:
+    current_pwm_value = value;
+    current_direction = PWM_BACKWARD_DIRECTION;
 }
 
 /**
@@ -147,4 +226,8 @@ void motor_stop(uint fw_pin, uint bk_pin, uint pwm_pin)
     gpio_put(fw_pin, false);
     gpio_put(bk_pin, false);
     pwm_set_gpio_level(pwm_pin, 0);
+
+    // store current PWM value and direction:
+    current_pwm_value = 0;
+    current_direction = PWM_FORWARD_DIRECTION;
 }

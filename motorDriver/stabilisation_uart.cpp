@@ -52,8 +52,8 @@ void uart_setup(int tx_pin, int rx_pin, void *uart_rx_callback)
     gpio_set_function(tx_pin, GPIO_FUNC_UART);
     gpio_set_function(rx_pin, GPIO_FUNC_UART);
 
-    irq_set_exclusive_handler(UART0_IRQ, (irq_handler_t)uart_rx_callback);
-    irq_set_enabled(UART0_IRQ, true);
+    irq_set_exclusive_handler(UART1_IRQ, (irq_handler_t)uart_rx_callback);
+    irq_set_enabled(UART1_IRQ, true);
 
     uart_set_irq_enables(UART_ID, true, false);
 }

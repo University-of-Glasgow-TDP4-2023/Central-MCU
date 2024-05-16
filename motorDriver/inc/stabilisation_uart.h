@@ -6,7 +6,7 @@
 #include "hardware/uart.h"
 #include "hardware/gpio.h"
 
-#define UART_ID uart0
+#define UART_ID uart1
 #define BAUD_RATE 115200
 
 bool process_message();

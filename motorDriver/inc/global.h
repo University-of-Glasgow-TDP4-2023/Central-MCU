@@ -22,6 +22,10 @@
 #define PWM_MAX_VALUE 255
 #define MID_SPEED 100
 #define PWM_MIN_VALUE 0
+
+// PWM delay in microseconds for the pwm to go from 0 to 255:
+#define PWM_DELAY 3000
+
 // #define PWM_DIV_INT_SHIFT 4
 // for 32kHz PWM clock frequency = 31250ns PWM clock period.
 // WRAP = PWM clock period / system clock period = 31250ns / 8ns = 3906
@@ -75,5 +79,8 @@
 #define BATTERY_ERROR_PIN 6 // pin 9
 
 extern int encoder_init_mode_active;
+
+extern uint8_t current_pwm_value;
+extern uint8_t current_direction; // 0 for forward, 1 for backward
 
 #endif // GLOBAL_H

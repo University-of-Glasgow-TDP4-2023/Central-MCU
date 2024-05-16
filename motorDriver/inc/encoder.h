@@ -31,7 +31,7 @@ void gpio_isr(uint gpio_pin, uint32_t events);
 void encoder_init();
 float measure_length();
 
-int get_current_speed_ms();
+float get_current_speed_ms();
 
 
 #endif // ENCODER_H
